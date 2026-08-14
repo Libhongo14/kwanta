@@ -55,7 +55,6 @@ if (config.env === 'production') {
   if (config.jwtSecret.startsWith('dev_')) bad.push('JWT_SECRET');
   if (config.adSsvHmacSecret.startsWith('dev_')) bad.push('AD_SSV_HMAC_SECRET');
   if (bad.length) {
-    console.error(`FATAL: insecure default secrets in production: ${bad.join(', ')}`);
-    process.exit(1);
+    throw new Error(`FATAL: insecure default secrets in production: ${bad.join(', ')}. Set real values in your host's environment variables.`);
   }
 }
