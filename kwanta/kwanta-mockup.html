@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kwanta — system mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --ink:#0B1626; --ink-2:#122036; --card:#0F1D31; --line:#22344f;
+  --green:#19C37D; --green-d:#0E8A5C; --amber:#F5A623; --red:#F06565; --blue:#5AA0FF;
+  --text:#E8EEF6; --muted:#8DA0BC;
+  --mono:'JetBrains Mono',monospace;
+  /* light tokens for phone screens */
+  --s-bg:#F4F7FB; --s-card:#fff; --s-line:#E4EAF2; --s-ink:#0E1A2B; --s-text:#1F2A37; --s-muted:#64748B;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--text);-webkit-font-smoothing:antialiased;
+  background:radial-gradient(900px 500px at 85% -5%, #16233c 0%, transparent 60%),
+             radial-gradient(700px 500px at 0% 8%, #122036 0%, transparent 55%), var(--ink);
+  min-height:100vh}
+.wrap{max-width:1080px;margin:0 auto;padding:2.4rem 1.2rem 4rem}
+h1{font-family:'Space Grotesk';font-weight:700;font-size:clamp(1.7rem,4vw,2.4rem);margin:0}
+.brand{display:flex;align-items:center;gap:.6rem;font-family:'Space Grotesk';font-weight:700;font-size:1.1rem}
+.brand-mark{width:1.9rem;height:1.9rem;display:grid;place-items:center;background:var(--green);color:#04140c;border-radius:8px}
+.eyebrow{color:var(--green);font-family:var(--mono);font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;margin:1.6rem 0 .6rem}
+.lede{color:var(--muted);max-width:56ch;margin:.6rem 0 0}
+
+.toggle{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:.32rem;gap:.3rem;margin:1.8rem 0 2rem}
+.toggle button{border:none;background:none;color:var(--muted);padding:.55rem 1.1rem;border-radius:8px;font-family:inherit;font-size:.9rem;cursor:pointer;font-weight:500}
+.toggle button.on{background:var(--ink-2);color:var(--text)}
+
+/* ── Phone mockups ─────────────────────────────────── */
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:2rem;justify-items:center}
+.device{width:280px}
+.screen-label{font-family:var(--mono);font-size:.72rem;color:var(--muted);text-align:center;margin-bottom:.7rem;letter-spacing:.06em}
+.phone{width:280px;height:580px;background:#050b15;border:9px solid #05101f;border-radius:34px;
+  box-shadow:0 24px 60px rgba(0,0,0,.5),0 0 0 1px #1b2c46;overflow:hidden;position:relative}
+.phone::before{content:'';position:absolute;top:10px;left:50%;transform:translateX(-50%);width:80px;height:5px;background:#1b2c46;border-radius:99px;z-index:20}
+.scr{position:absolute;inset:0;background:var(--s-bg);overflow:hidden;font-size:12px;color:var(--s-text)}
+.scr-scroll{position:absolute;inset:0;padding:26px 12px 12px;overflow:hidden}
+
+/* mini app bits (light theme, mirrors the real UI) */
+.m-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.m-brand{display:flex;align-items:center;gap:5px;font-family:'Space Grotesk';font-weight:700;font-size:13px;color:var(--s-ink)}
+.m-brand i{width:18px;height:18px;background:var(--green);color:#04140c;border-radius:6px;display:grid;place-items:center;font-style:normal;font-size:10px}
+.m-link{color:var(--s-muted);font-size:10px}
+.m-balance{background:linear-gradient(150deg,#0E1A2B,#1C2E45);color:#fff;border-radius:15px;padding:16px 15px;margin-bottom:12px}
+.m-balance .lab{font-size:10px;color:#9fb0c7}
+.m-balance .num{font-family:'Space Grotesk';font-weight:700;font-size:34px;line-height:1;margin:4px 0;font-variant-numeric:tabular-nums}
+.m-balance .num small{font-size:12px;color:#9fb0c7;font-weight:500}
+.m-balance .val{color:var(--amber);font-weight:600;font-size:12px}
+.m-bar{height:5px;background:rgba(255,255,255,.12);border-radius:99px;margin-top:11px;overflow:hidden}
+.m-bar i{display:block;height:100%;background:var(--green);border-radius:99px}
+.m-bar-cap{font-size:9px;color:#9fb0c7;margin-top:5px}
+.m-panel{background:#fff;border:1px solid var(--s-line);border-radius:14px;padding:13px;margin-bottom:11px}
+.m-panel h5{margin:0 0 8px;font-size:12px;color:var(--s-ink);font-weight:600}
+.m-muted{color:var(--s-muted);font-size:10px;margin:0 0 9px}
+.m-btn{display:block;width:100%;text-align:center;background:var(--green);color:#fff;border-radius:9px;padding:10px;font-weight:600;font-size:12px}
+.m-btn.ghost{background:#fff;border:1px solid var(--s-line);color:var(--s-text);font-weight:500}
+.m-field{background:#fff;border:1px solid var(--s-line);border-radius:9px;padding:9px;font-size:11px;color:var(--s-muted);margin-top:7px}
+.m-row{display:flex;gap:6px}
+.m-row .m-field{flex:1;margin-top:0}
+.m-hint{font-size:9px;color:var(--s-muted);margin-top:8px}
+.m-led{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--s-line);font-size:11px}
+.m-led:last-child{border-bottom:none}
+.m-led .sub{font-size:9px;color:var(--s-muted)}
+.m-plus{color:var(--green);font-weight:600}
+.m-minus{color:var(--s-muted);font-weight:600}
+.m-badge{font-size:8px;padding:2px 7px;border-radius:99px;font-weight:600}
+.b-pending{background:#FFF3D6;color:#8a6d1f}.b-paid{background:#DCF5EA;color:#0E8A5C}.b-approved{background:#E1EEFF;color:#2a5aa0}
+.m-verify{background:#FFF8EC;border:1px solid #F5E4C3;border-radius:11px;padding:10px;margin-bottom:11px}
+.m-auth-bg{position:absolute;inset:0;background:radial-gradient(600px 300px at 50% -10%,#16233a,#0E1A2B 60%);display:grid;place-items:center;padding:16px}
+.m-auth{background:#fff;border-radius:15px;padding:18px 15px;width:100%}
+.m-auth .tag{color:var(--s-muted);font-size:10px;margin:6px 0 13px;line-height:1.5}
+.m-tabs{display:flex;gap:4px;background:var(--s-bg);padding:3px;border-radius:9px;margin-bottom:13px}
+.m-tabs span{flex:1;text-align:center;font-size:10px;padding:6px;border-radius:7px;color:var(--s-muted)}
+.m-tabs span.on{background:#fff;color:var(--s-text);font-weight:600}
+.m-fine{font-size:8px;color:var(--s-muted);margin-top:12px;line-height:1.5}
+/* admin stat grid */
+.m-stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px}
+.m-stat{background:#fff;border:1px solid var(--s-line);border-radius:10px;padding:9px}
+.m-stat .k{font-size:8px;color:var(--s-muted)}
+.m-stat .v{font-family:'Space Grotesk';font-weight:700;font-size:16px;margin-top:2px;color:var(--s-ink)}
+.m-stat .v.g{color:var(--green-d)}
+.m-apr{display:flex;gap:4px;margin-top:8px}
+.m-apr span{flex:1;text-align:center;font-size:9px;padding:6px;border-radius:7px;border:1px solid var(--s-line);color:var(--s-text)}
+.m-apr span.pri{background:var(--green);color:#fff;border-color:var(--green)}
+
+/* ── Architecture ─────────────────────────────────── */
+.arch{display:none}
+.arch.on{display:block}
+.gallery.off{display:none}
+.diagram{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.6rem;overflow-x:auto}
+.layer{margin-bottom:1.4rem}
+.layer:last-child{margin-bottom:0}
+.layer-h{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);margin-bottom:.7rem}
+.nodes{display:flex;gap:.7rem;flex-wrap:wrap}
+.node{background:var(--ink-2);border:1px solid var(--line);border-radius:11px;padding:.75rem .9rem;min-width:130px;flex:1}
+.node .nt{font-family:'Space Grotesk';font-weight:600;font-size:.9rem}
+.node .nd{color:var(--muted);font-size:.76rem;margin-top:.2rem;line-height:1.4}
+.node.ext{border-style:dashed;border-color:#3a4d6b}
+.node.green{border-color:var(--green)}
+.node.blue{border-color:var(--blue)}
+.node.amber{border-color:var(--amber)}
+.arr{text-align:center;color:var(--muted);font-size:1.1rem;margin:.5rem 0;letter-spacing:.4em}
+.flow{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.4rem 1.5rem;margin-top:1.4rem}
+.flow h3{font-family:'Space Grotesk';font-size:1rem;margin:0 0 .9rem;color:var(--green)}
+.flow ol{margin:0;padding-left:1.2rem;color:var(--muted);font-size:.9rem}
+.flow li{margin:.4rem 0}
+.flow code{background:var(--ink-2);padding:.1rem .4rem;border-radius:5px;font-family:var(--mono);font-size:.8rem;color:var(--text)}
+.legend{display:flex;gap:1.2rem;flex-wrap:wrap;margin-top:1rem;font-size:.78rem;color:var(--muted)}
+.legend b{display:inline-block;width:.75rem;height:.75rem;border-radius:3px;margin-right:.35rem;vertical-align:middle}
+footer{color:var(--muted);font-size:.82rem;margin-top:2.4rem;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><span class="brand-mark">K</span> Kwanta</div>
+  <div class="eyebrow">System mockup</div>
+  <h1>What the product looks like — and how it's wired</h1>
+  <p class="lede">Static mockups of every screen, plus the component architecture behind them. Nothing here is live; it's a faithful picture of the running app.</p>
+
+  <div class="toggle" id="toggle">
+    <button class="on" data-v="screens">App screens</button>
+    <button data-v="arch">Architecture</button>
+  </div>
+
+  <!-- ── SCREENS ── -->
+  <div class="gallery" id="screens">
+
+    <!-- Sign in -->
+    <div class="device">
+      <div class="screen-label">SIGN IN</div>
+      <div class="phone"><div class="scr"><div class="m-auth-bg">
+        <div class="m-auth">
+          <div class="m-brand"><i>K</i> Kwanta</div>
+          <div class="tag">Watch ads. Earn points. Cash out for airtime, data, or money.</div>
+          <div class="m-tabs"><span class="on">Sign in</span><span>Create account</span></div>
+          <div class="m-field">you@email.com</div>
+          <div class="m-field" style="margin-top:7px">••••••••</div>
+          <div class="m-btn" style="margin-top:11px">Sign in</div>
+          <div class="m-fine">By continuing you agree that points are rewards for engagement and are redeemed at the rates shown. Payouts are reviewed before payment.</div>
+        </div>
+      </div></div></div>
+    </div>
+
+    <!-- Earn dashboard -->
+    <div class="device">
+      <div class="screen-label">EARN DASHBOARD</div>
+      <div class="phone"><div class="scr"><div class="scr-scroll">
+        <div class="m-top"><div class="m-brand"><i>K</i> Kwanta</div><div class="m-link">Sign out</div></div>
+        <div class="m-balance">
+          <div class="lab">Your balance</div>
+          <div class="num">4 820 <small>pts</small></div>
+          <div class="val">R48.20</div>
+          <div class="m-bar"><i style="width:96%"></i></div>
+          <div class="m-bar-cap">180 pts to your first payout</div>
+        </div>
+        <div class="m-panel">
+          <h5>Earn</h5>
+          <p class="m-muted">17 of 25 ads left today · +1 pt each</p>
+          <div class="m-btn">Watch ad &amp; earn</div>
+          <div class="m-hint">Each completed ad is verified on our server before points are added.</div>
+        </div>
+        <div class="m-panel">
+          <h5>Activity</h5>
+          <div class="m-led"><span>Ad reward<div class="sub">Jul 11 · 20:14</div></span><span class="m-plus">+1</span></div>
+          <div class="m-led"><span>Ad reward<div class="sub">Jul 11 · 20:13</div></span><span class="m-plus">+1</span></div>
+          <div class="m-led"><span>Payout request<div class="sub">Jul 10 · 18:02</div></span><span class="m-minus">−3000</span></div>
+        </div>
+      </div></div></div>
+    </div>
+
+    <!-- Cash out -->
+    <div class="device">
+      <div class="screen-label">CASH OUT</div>
+      <div class="phone"><div class="scr"><div class="scr-scroll">
+        <div class="m-top"><div class="m-brand"><i>K</i> Kwanta</div><div class="m-link">Sign out</div></div>
+        <div class="m-panel">
+          <h5>Cash out</h5>
+          <div class="m-verify">
+            <p class="m-muted" style="margin-bottom:7px">Verify your phone to enable payouts.</p>
+            <div class="m-row"><div class="m-field">071 234 5678</div><div class="m-btn ghost" style="width:auto;padding:9px 11px">Send code</div></div>
+          </div>
+          <div class="m-muted" style="margin-bottom:4px">Amount (points)</div>
+          <div class="m-field">5000</div>
+          <div class="m-muted" style="margin:9px 0 4px">Method</div>
+          <div class="m-field">Airtime ▾</div>
+          <div class="m-muted" style="margin:9px 0 4px">Send to</div>
+          <div class="m-field">071 234 5678</div>
+          <div class="m-btn" style="margin-top:11px">Request payout</div>
+        </div>
+        <div class="m-panel">
+          <h5>Payouts</h5>
+          <div class="m-led"><span>R30.00 · airtime<div class="sub">071… · Jul 10</div></span><span class="m-badge b-pending">pending</span></div>
+          <div class="m-led"><span>R50.00 · data<div class="sub">071… · Jul 3</div></span><span class="m-badge b-paid">paid</span></div>
+        </div>
+      </div></div></div>
+    </div>
+
+    <!-- Admin -->
+    <div class="device">
+      <div class="screen-label">ADMIN PANEL</div>
+      <div class="phone"><div class="scr"><div class="scr-scroll">
+        <div class="m-top"><div class="m-brand"><i>K</i> Kwanta · Admin</div><div class="m-link">Back</div></div>
+        <div class="m-stats">
+          <div class="m-stat"><div class="k">Users</div><div class="v">1 284</div></div>
+          <div class="m-stat"><div class="k">Ad views</div><div class="v">86 400</div></div>
+          <div class="m-stat"><div class="k">Gross revenue</div><div class="v">R172.80</div></div>
+          <div class="m-stat"><div class="k">Paid out</div><div class="v">R43.00</div></div>
+          <div class="m-stat"><div class="k">Pending</div><div class="v">R18.00</div></div>
+          <div class="m-stat"><div class="k">Margin</div><div class="v g">R129.80</div></div>
+        </div>
+        <div class="m-panel">
+          <h5>Pending payouts</h5>
+          <div style="font-size:11px"><b>R30.00</b> · airtime → 071 234 5678</div>
+          <div class="sub" style="font-size:9px;color:var(--s-muted);margin-top:2px">lindi@mail.co.za · phone ✓ · Jul 10</div>
+          <div class="m-apr"><span class="pri">Mark paid</span><span>Approve</span><span>Reject</span></div>
+        </div>
+      </div></div></div>
+    </div>
+
+  </div><!-- /gallery -->
+
+  <!-- ── ARCHITECTURE ── -->
+  <div class="arch" id="arch">
+    <div class="diagram">
+      <div class="layer">
+        <div class="layer-h">Client · browser (mobile-first web)</div>
+        <div class="nodes">
+          <div class="node green"><div class="nt">Frontend</div><div class="nd">Vanilla JS + CSS. Dashboard, cash-out, admin. Animated balance. No build step.</div></div>
+          <div class="node ext amber"><div class="nt">AdSense H5 ↗</div><div class="nd">Rewarded video in-page via Ad Placement API. Fires <code>adViewed</code> in the browser.</div></div>
+        </div>
+      </div>
+      <div class="arr">▼ &nbsp; HTTPS / JWT &nbsp; ▼</div>
+      <div class="layer">
+        <div class="layer-h">API · Node + Express</div>
+        <div class="nodes">
+          <div class="node blue"><div class="nt">auth</div><div class="nd">register, login, phone OTP</div></div>
+          <div class="node blue"><div class="nt">ads</div><div class="nd">session, claim, ssv, config</div></div>
+          <div class="node blue"><div class="nt">points</div><div class="nd">balance, history</div></div>
+          <div class="node blue"><div class="nt">payouts</div><div class="nd">request, mine</div></div>
+          <div class="node blue"><div class="nt">admin</div><div class="nd">overview, resolve, moderation</div></div>
+        </div>
+        <div class="nodes" style="margin-top:.7rem">
+          <div class="node"><div class="nt">middleware</div><div class="nd">JWT auth guard · admin guard · rate limiter · security headers</div></div>
+        </div>
+      </div>
+      <div class="arr">▼</div>
+      <div class="layer">
+        <div class="layer-h">Services · business logic</div>
+        <div class="nodes">
+          <div class="node green"><div class="nt">adReward</div><div class="nd">Issues single-use sessions. Verifies AdMob SSV signature / HMAC. Idempotent credit.</div></div>
+          <div class="node green"><div class="nt">ledger</div><div class="nd">Append-only entries. Balance = SUM(points). No mutable balance field.</div></div>
+          <div class="node green"><div class="nt">fraud</div><div class="nd">Daily caps · IP velocity · multi-account-per-IP checks.</div></div>
+        </div>
+      </div>
+      <div class="arr">▼</div>
+      <div class="layer">
+        <div class="layer-h">Data · SQLite (→ Postgres for scale)</div>
+        <div class="nodes">
+          <div class="node"><div class="nt">users</div><div class="nd">accounts, phone, status</div></div>
+          <div class="node"><div class="nt">points_ledger</div><div class="nd">append-only</div></div>
+          <div class="node"><div class="nt">ad_events</div><div class="nd">unique txn per view</div></div>
+          <div class="node"><div class="nt">ad_sessions</div><div class="nd">single-use tokens</div></div>
+          <div class="node"><div class="nt">payouts</div><div class="nd">pending→paid</div></div>
+          <div class="node"><div class="nt">otp_codes</div><div class="nd">phone verify</div></div>
+        </div>
+      </div>
+      <div class="layer" style="margin-top:1.4rem">
+        <div class="layer-h">External integrations</div>
+        <div class="nodes">
+          <div class="node ext amber"><div class="nt">AdMob SSV ↗</div><div class="nd">Server-to-server signed callback → <code>/api/ads/ssv</code>. True verification (app path).</div></div>
+          <div class="node ext"><div class="nt">SMS provider ↗</div><div class="nd">OTP delivery (Clickatell / Twilio). Console in dev.</div></div>
+          <div class="node ext"><div class="nt">Payout provider ↗</div><div class="nd">Flutterwave / Peach / airtime reseller. Manual by default.</div></div>
+        </div>
+      </div>
+      <div class="legend">
+        <span><b style="background:var(--green)"></b>core logic</span>
+        <span><b style="background:var(--blue)"></b>API routes</span>
+        <span><b style="background:var(--amber)"></b>ad network</span>
+        <span><b style="background:#3a4d6b"></b>external (dashed)</span>
+      </div>
+    </div>
+
+    <div class="flow">
+      <h3>Reward flow — the critical path</h3>
+      <ol>
+        <li>Browser: user taps <b>Watch ad &amp; earn</b> → <code>POST /api/ads/session</code> returns a single-use token (eligibility + caps checked).</li>
+        <li>Ad plays. <b>Web:</b> browser confirms via <code>adViewed</code> → <code>POST /api/ads/claim</code>. <b>App:</b> ad network's server calls <code>POST /api/ads/ssv</code> with a signed payload.</li>
+        <li><b>adReward</b> verifies (signature for SSV / valid session for claim), rejects replays via the unique transaction id, and enforces the daily cap again.</li>
+        <li><b>ledger</b> appends <code>+1</code>. Balance recomputes as the sum. UI ticks up.</li>
+        <li>At payout, points are <b>held</b> (a negative ledger entry) so they can't be double-spent; admin approves or rejects (refund).</li>
+      </ol>
+    </div>
+  </div>
+
+  <footer>Static mockup of the Kwanta system. Screens mirror <span style="font-family:var(--mono)">server/public</span>; architecture mirrors <span style="font-family:var(--mono)">server/routes</span> + <span style="font-family:var(--mono)">server/services</span>.</footer>
+</div>
+
+<script>
+const btns = document.querySelectorAll('#toggle button');
+const screens = document.getElementById('screens');
+const arch = document.getElementById('arch');
+btns.forEach(b => b.addEventListener('click', () => {
+  btns.forEach(x => x.classList.remove('on'));
+  b.classList.add('on');
+  const v = b.dataset.v;
+  screens.classList.toggle('off', v !== 'screens');
+  arch.classList.toggle('on', v === 'arch');
+}));
+</script>
+</body>
+</html>

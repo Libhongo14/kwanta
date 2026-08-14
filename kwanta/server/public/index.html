@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kwanta — watch, earn, cash out</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<!-- AUTH -->
+<main id="view-auth" class="auth-wrap">
+  <div class="auth-card">
+    <div class="brand"><span class="brand-mark">K</span> Kwanta</div>
+    <p class="auth-tag">Watch ads. Earn points. Cash out for airtime, data, or money.</p>
+    <div class="tabs">
+      <button class="tab active" data-tab="login">Sign in</button>
+      <button class="tab" data-tab="register">Create account</button>
+    </div>
+    <form id="form-auth" autocomplete="on">
+      <label>Email<input type="email" id="auth-email" required placeholder="you@email.com" /></label>
+      <label>Password<input type="password" id="auth-password" required minlength="8" placeholder="At least 8 characters" /></label>
+      <button class="btn btn-primary" id="auth-submit" type="submit">Sign in</button>
+    </form>
+    <p class="fineprint">By continuing you agree that points are rewards for engagement and are redeemed at the rates shown. Payouts are reviewed before payment.</p>
+  </div>
+</main>
+
+<!-- APP -->
+<div id="view-app" class="app hidden">
+  <header class="topbar">
+    <div class="brand small"><span class="brand-mark">K</span> Kwanta</div>
+    <div class="topbar-right">
+      <button class="link" id="nav-admin" hidden>Admin</button>
+      <span class="user-email" id="user-email"></span>
+      <button class="link" id="btn-logout">Sign out</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Balance signature card -->
+    <section class="balance-card">
+      <div class="balance-label">Your balance</div>
+      <div class="balance-number"><span id="balance-points">0</span><span class="pts">pts</span></div>
+      <div class="balance-value" id="balance-value">R0.00</div>
+      <div class="progress">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+      <div class="progress-caption" id="progress-caption"></div>
+    </section>
+
+    <!-- Play & earn -->
+    <section class="panel games-panel">
+      <h2>Play &amp; earn</h2>
+      <p class="muted" id="ads-remaining">—</p>
+      <div class="game-cards">
+        <button class="game-card" id="play-coin">
+          <span class="game-emoji">🪙</span>
+          <span class="game-name">Coin Rush</span>
+          <span class="game-desc">20s tap challenge — dodge the bombs</span>
+        </button>
+        <button class="game-card" id="play-reflex">
+          <span class="game-emoji">⚡</span>
+          <span class="game-name">Reflex Tap</span>
+          <span class="game-desc">Test your reaction speed, 3 rounds</span>
+        </button>
+      </div>
+      <p class="hint">Finish a round, then watch a short ad to claim your point — verified on our server, every time.</p>
+      <button class="btn btn-lg" id="btn-watch">Or just watch an ad &amp; earn</button>
+      <div class="ad-modal hidden" id="ad-modal">
+        <div class="ad-spinner"></div>
+        <div>Ad playing… <span id="ad-count"></span></div>
+      </div>
+    </section>
+
+    <!-- Game modal -->
+    <div class="game-modal hidden" id="game-modal">
+      <div class="game-modal-card">
+        <div class="game-modal-head">
+          <span id="game-modal-title">Game</span>
+          <button class="link" id="game-modal-close">Close ✕</button>
+        </div>
+        <div id="game-modal-body"></div>
+      </div>
+    </div>
+
+    <div class="grid">
+
+      <!-- Cash out -->
+      <section class="panel">
+        <h2>Cash out</h2>
+        <div id="verify-block" class="verify-block hidden">
+          <p class="muted">Verify your phone to enable payouts.</p>
+          <div class="row">
+            <input type="tel" id="phone" placeholder="071 234 5678" />
+            <button class="btn" id="btn-send-otp">Send code</button>
+          </div>
+          <div class="row hidden" id="otp-row">
+            <input type="text" id="otp" placeholder="6-digit code" inputmode="numeric" />
+            <button class="btn" id="btn-verify-otp">Verify</button>
+          </div>
+        </div>
+        <form id="form-payout">
+          <label>Amount (points)<input type="number" id="payout-points" min="1" step="1" placeholder="5000" /></label>
+          <label>Method
+            <select id="payout-method">
+              <option value="airtime">Airtime</option>
+              <option value="data">Data bundle</option>
+              <option value="cash">Cash</option>
+            </select>
+          </label>
+          <label>Send to<input type="text" id="payout-dest" placeholder="Phone number or account" /></label>
+          <button class="btn btn-primary" type="submit" id="btn-payout">Request payout</button>
+        </form>
+      </section>
+    </div>
+
+    <div class="grid">
+      <section class="panel">
+        <h2>Activity</h2>
+        <ul class="ledger" id="ledger"></ul>
+      </section>
+      <section class="panel">
+        <h2>Payouts</h2>
+        <ul class="payouts" id="payouts"></ul>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- ADMIN -->
+<div id="view-admin" class="app hidden">
+  <header class="topbar">
+    <div class="brand small"><span class="brand-mark">K</span> Kwanta · Admin</div>
+    <div class="topbar-right"><button class="link" id="admin-back">Back</button></div>
+  </header>
+  <main class="container">
+    <section class="stats" id="admin-stats"></section>
+    <section class="panel">
+      <h2>Pending payouts</h2>
+      <ul class="admin-payouts" id="admin-payouts"></ul>
+    </section>
+  </main>
+</div>
+
+<script src="/app.js"></script>
+<script src="/games.js"></script>
+</body>
+</html>

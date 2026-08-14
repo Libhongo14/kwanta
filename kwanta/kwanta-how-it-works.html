@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>How Kwanta works</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --ink:#0B1626; --ink-2:#122036; --panel:#16243c;
+  --bg:#0B1626; --card:#0F1D31; --line:#22344f;
+  --green:#19C37D; --green-d:#0E8A5C; --amber:#F5A623; --red:#F06565;
+  --text:#E8EEF6; --muted:#8DA0BC; --muted-2:#5F7096;
+  --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:
+  radial-gradient(900px 500px at 85% -5%, #16233c 0%, transparent 60%),
+  radial-gradient(700px 500px at 0% 10%, #122036 0%, transparent 55%),
+  var(--bg);
+  color:var(--text);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
+.wrap{max-width:960px;margin:0 auto;padding:0 1.2rem}
+h1,h2,h3{font-family:'Space Grotesk';font-weight:700;line-height:1.15;margin:0}
+a{color:var(--green)}
+.mono{font-family:var(--mono)}
+
+/* Hero */
+header{padding:4rem 0 2rem;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:.6rem;font-family:'Space Grotesk';font-weight:700;font-size:1.2rem}
+.brand-mark{width:2rem;height:2rem;display:grid;place-items:center;background:var(--green);color:#04140c;border-radius:9px}
+.eyebrow{color:var(--green);font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;margin:2.2rem 0 .8rem}
+h1{font-size:clamp(2rem,6vw,3.4rem)}
+.lede{color:var(--muted);font-size:1.12rem;max-width:44ch;margin:1rem 0 0}
+.hero-meta{display:flex;gap:1.6rem;flex-wrap:wrap;margin-top:2rem}
+.hero-meta div{font-size:.85rem;color:var(--muted)}
+.hero-meta b{display:block;font-family:'Space Grotesk';font-size:1.5rem;color:var(--text)}
+
+section{padding:3.4rem 0;border-bottom:1px solid var(--line)}
+.section-eyebrow{color:var(--amber);font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase}
+h2{font-size:1.7rem;margin:.5rem 0 1.4rem}
+.sub{color:var(--muted);max-width:60ch;margin:-.6rem 0 1.8rem}
+
+/* Pipeline */
+.pipe{display:grid;grid-template-columns:repeat(5,1fr);gap:.5rem;position:relative;margin:2rem 0 1rem}
+.stage{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:.9rem .7rem;text-align:center;cursor:pointer;transition:.18s;position:relative;z-index:2}
+.stage:hover{border-color:var(--green);transform:translateY(-2px)}
+.stage.active{border-color:var(--green);box-shadow:0 0 0 1px var(--green),0 10px 30px rgba(25,195,125,.12)}
+.stage .n{font-family:var(--mono);font-size:.68rem;color:var(--muted)}
+.stage .t{font-family:'Space Grotesk';font-weight:600;font-size:.82rem;margin-top:.35rem;line-height:1.2}
+.track{position:absolute;top:50%;left:4%;right:4%;height:2px;background:var(--line);z-index:1}
+.token{position:absolute;top:50%;left:0;width:12px;height:12px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 12px var(--green);transform:translate(-50%,-50%);z-index:3;transition:left 1.1s cubic-bezier(.5,0,.2,1);opacity:0}
+.detail{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.4rem 1.5rem;min-height:120px;margin-top:1rem}
+.detail h3{font-size:1.05rem;color:var(--green);margin-bottom:.5rem}
+.detail p{margin:.4rem 0;color:var(--muted)}
+.detail code{background:var(--ink-2);padding:.12rem .4rem;border-radius:5px;font-family:var(--mono);font-size:.82rem;color:var(--text)}
+.controls{display:flex;gap:.6rem;margin-top:1rem;flex-wrap:wrap}
+.btn{font-family:inherit;font-size:.9rem;cursor:pointer;border-radius:9px;padding:.55rem 1rem;border:1px solid var(--line);background:var(--card);color:var(--text);transition:.15s}
+.btn:hover{border-color:var(--green)}
+.btn.primary{background:var(--green);border-color:var(--green);color:#04140c;font-weight:600}
+.btn.primary:hover{background:var(--green-d)}
+
+/* Two paths toggle */
+.toggle{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.3rem;gap:.3rem;margin-bottom:1.2rem}
+.toggle button{border:none;background:none;color:var(--muted);padding:.5rem .9rem;border-radius:7px;font-family:inherit;font-size:.86rem;cursor:pointer}
+.toggle button.on{background:var(--ink-2);color:var(--text)}
+.path-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.4rem 1.5rem}
+.path-card .tag{display:inline-block;font-family:var(--mono);font-size:.7rem;padding:.2rem .55rem;border-radius:99px;margin-bottom:.7rem}
+.tag.free{background:rgba(25,195,125,.14);color:var(--green)}
+.tag.ssv{background:rgba(245,166,35,.14);color:var(--amber)}
+.path-card ul{margin:.6rem 0 0;padding-left:1.1rem;color:var(--muted)}
+.path-card li{margin:.3rem 0}
+
+/* Economics calculator */
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:1.6rem}
+.calc .inputs label{display:block;font-size:.82rem;color:var(--muted);margin:1rem 0 .3rem}
+.calc .inputs .val{color:var(--text);font-family:var(--mono)}
+input[type=range]{width:100%;accent-color:var(--green)}
+.result{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.5rem}
+.result .big{font-family:'Space Grotesk';font-weight:700;font-size:2.6rem;line-height:1;color:var(--green)}
+.result .big.neg{color:var(--red)}
+.result .cap{color:var(--muted);font-size:.85rem;margin-top:.3rem}
+.result .rows{margin-top:1.3rem;border-top:1px solid var(--line);padding-top:1rem}
+.result .r{display:flex;justify-content:space-between;font-size:.9rem;padding:.35rem 0;color:var(--muted)}
+.result .r b{color:var(--text);font-family:var(--mono)}
+.warn{background:rgba(240,101,101,.1);border:1px solid rgba(240,101,101,.35);color:#ffc9c9;
+  border-radius:10px;padding:.7rem .9rem;font-size:.84rem;margin-top:1rem;display:none}
+.warn.show{display:block}
+
+/* Data model */
+.tables{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.9rem}
+.tbl{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1rem 1.1rem}
+.tbl h4{margin:0 0 .5rem;font-family:var(--mono);font-size:.8rem;color:var(--green)}
+.tbl ul{margin:0;padding-left:1rem;color:var(--muted);font-size:.82rem}
+.tbl li{margin:.15rem 0}
+
+/* Steps / run */
+.steps{counter-reset:s;margin-top:1rem}
+.step{position:relative;padding:0 0 1.4rem 3rem;border-left:2px solid var(--line);margin-left:1rem}
+.step:last-child{border-left-color:transparent}
+.step::before{counter-increment:s;content:counter(s);position:absolute;left:-1rem;top:-.2rem;width:2rem;height:2rem;
+  background:var(--green);color:#04140c;border-radius:50%;display:grid;place-items:center;font-family:'Space Grotesk';font-weight:700;font-size:.9rem}
+.step h4{margin:.1rem 0 .5rem;font-size:1rem}
+.step p{margin:.2rem 0;color:var(--muted);font-size:.92rem}
+pre{background:#081020;border:1px solid var(--line);border-radius:10px;padding:.85rem 1rem;overflow-x:auto;position:relative}
+pre code{font-family:var(--mono);font-size:.84rem;color:#cfe3ff;white-space:pre}
+.copy{position:absolute;top:.5rem;right:.5rem;font-size:.7rem;padding:.25rem .55rem;border:1px solid var(--line);background:var(--ink-2);color:var(--muted);border-radius:6px;cursor:pointer}
+.copy:hover{color:var(--text);border-color:var(--green)}
+.note{font-size:.82rem;color:var(--muted);background:var(--card);border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:8px;padding:.7rem .9rem;margin-top:1rem}
+footer{padding:2.5rem 0;color:var(--muted);font-size:.85rem}
+
+@media(max-width:720px){
+  .pipe{grid-template-columns:repeat(2,1fr)}
+  .track,.token{display:none}
+  .calc{grid-template-columns:1fr}
+  .hero-meta{gap:1.1rem}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="brand"><span class="brand-mark">K</span> Kwanta</div>
+    <div class="eyebrow">How it works</div>
+    <h1>Watch an ad.<br>Earn a point.<br>Cash out — for real.</h1>
+    <p class="lede">A rewards platform where you keep the margin between what the ad network pays you and the smaller reward you pay the user. Here's the whole machine, end to end.</p>
+    <div class="hero-meta">
+      <div><b>Node + Express</b>API & server logic</div>
+      <div><b>SQLite</b>append-only ledger</div>
+      <div><b>AdSense H5</b>free rewarded ads</div>
+      <div><b>Verified</b>server-side reward checks</div>
+    </div>
+  </div>
+</header>
+
+<!-- EARN LOOP -->
+<section>
+  <div class="wrap">
+    <div class="section-eyebrow">The earn loop</div>
+    <h2>One ad, five steps</h2>
+    <p class="sub">Tap a stage to see what happens. The point is only ever credited by the server — never by the browser alone.</p>
+
+    <div class="pipe" id="pipe">
+      <div class="track"></div>
+      <div class="token" id="token"></div>
+      <div class="stage active" data-i="0"><div class="n">01</div><div class="t">Tap “Watch &amp; earn”</div></div>
+      <div class="stage" data-i="1"><div class="n">02</div><div class="t">Server issues session</div></div>
+      <div class="stage" data-i="2"><div class="n">03</div><div class="t">Ad plays</div></div>
+      <div class="stage" data-i="3"><div class="n">04</div><div class="t">Reward verified</div></div>
+      <div class="stage" data-i="4"><div class="n">05</div><div class="t">Ledger + balance</div></div>
+    </div>
+
+    <div class="detail" id="detail"></div>
+    <div class="controls">
+      <button class="btn primary" id="play">▶ Play the loop</button>
+      <button class="btn" id="reset">Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- VERIFICATION / TWO PATHS -->
+<section>
+  <div class="wrap">
+    <div class="section-eyebrow">Why a view can't be faked</div>
+    <h2>Two ways to verify a reward</h2>
+    <p class="sub">The browser saying “I watched it” isn't enough on its own. How strong the proof is depends on which network path you run.</p>
+
+    <div class="toggle" id="toggle">
+      <button class="on" data-p="web">AdSense H5 · Web</button>
+      <button data-p="app">AdMob · App</button>
+    </div>
+    <div id="path-web" class="path-card">
+      <span class="tag free">FREE · WIRED · DEFAULT</span>
+      <h3>AdSense H5 Games Ads (web)</h3>
+      <p style="color:var(--muted)">The ad's <code>adViewed</code> callback fires in the browser, then the page calls <code>POST /api/ads/claim</code>. There's no cryptographic server verification on web — so the server leans on other guards:</p>
+      <ul>
+        <li>The claim must carry a <b>single-use session token</b> the server issued to that signed-in user, valid 15 minutes.</li>
+        <li>Bound by the <b>daily ad cap</b>, IP-velocity checks, and a unique-transaction guard (no double-credit).</li>
+        <li>Worst case abuse = a user farming their own <i>capped</i> account — not minting free points.</li>
+      </ul>
+    </div>
+    <div id="path-app" class="path-card" style="display:none">
+      <span class="tag ssv">TRUE SSV · ALSO BUILT</span>
+      <h3>AdMob rewarded (Android app)</h3>
+      <p style="color:var(--muted)">The ad network's <b>servers</b> call <code>POST /api/ads/ssv</code> directly. The callback is signed, and the server verifies it against Google's public keys before crediting.</p>
+      <ul>
+        <li>Signature checked with <code>verifyAdmobSsv</code> — a forged callback is rejected.</li>
+        <li>Reward is tied to the same single-use session via <code>custom_data</code>.</li>
+        <li>Genuinely un-fakeable. Use this when you wrap the game in an app.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ECONOMICS -->
+<section>
+  <div class="wrap">
+    <div class="section-eyebrow">The money</div>
+    <h2>Where your profit comes from</h2>
+    <p class="sub">You earn per ad view. You pay the user less per view. Drag the sliders to see your margin — and the warning when the reward is set too high.</p>
+
+    <div class="calc">
+      <div class="inputs">
+        <label>Ad eCPM — what the network pays you per 1,000 views
+          <span class="val" id="ecpm-v"></span></label>
+        <input type="range" id="ecpm" min="1" max="30" step="0.5" value="3" />
+
+        <label>Reward per ad you pay the user <span class="val" id="reward-v"></span></label>
+        <input type="range" id="reward" min="0" max="2" step="0.05" value="0.05" />
+
+        <label>Daily active users <span class="val" id="dau-v"></span></label>
+        <input type="range" id="dau" min="50" max="50000" step="50" value="2000" />
+
+        <label>Ads watched per user per day <span class="val" id="apu-v"></span></label>
+        <input type="range" id="apu" min="1" max="25" step="1" value="8" />
+      </div>
+      <div class="result">
+        <div class="big" id="monthly">R0</div>
+        <div class="cap">estimated monthly margin (profit)</div>
+        <div class="rows">
+          <div class="r"><span>Revenue per ad</span><b id="rpa"></b></div>
+          <div class="r"><span>Margin per ad</span><b id="mpa"></b></div>
+          <div class="r"><span>Ads / day</span><b id="apd"></b></div>
+          <div class="r"><span>Gross / month</span><b id="gpm"></b></div>
+          <div class="r"><span>Paid to users / month</span><b id="ppm"></b></div>
+        </div>
+        <div class="warn" id="warn">⚠ Your reward per ad is ≥ what the network pays you. You'd lose money on every view. Lower the reward or raise your eCPM (mediation helps).</div>
+      </div>
+    </div>
+    <p class="note">These are illustrative. Real eCPM in South Africa often sits low single digits (rand), which is why retention and volume — not one-off traffic — drive the numbers.</p>
+  </div>
+</section>
+
+<!-- DATA MODEL -->
+<section>
+  <div class="wrap">
+    <div class="section-eyebrow">Under the hood</div>
+    <h2>The data model</h2>
+    <p class="sub">Six tables. The balance is never a stored number you can tamper with — it's always the sum of the ledger.</p>
+    <div class="tables">
+      <div class="tbl"><h4>users</h4><ul><li>email, password hash</li><li>phone + verified flag</li><li>status: active/flagged/banned</li></ul></div>
+      <div class="tbl"><h4>points_ledger</h4><ul><li>append-only entries</li><li>+earn / −redeem</li><li>balance = SUM(points)</li></ul></div>
+      <div class="tbl"><h4>ad_events</h4><ul><li>one row per verified view</li><li>unique transaction_id</li><li>revenue recorded</li></ul></div>
+      <div class="tbl"><h4>ad_sessions</h4><ul><li>single-use tokens</li><li>tie a view to a user</li><li>expire in 15 min</li></ul></div>
+      <div class="tbl"><h4>payouts</h4><ul><li>pending → approved → paid</li><li>points held on request</li><li>refunded if rejected</li></ul></div>
+      <div class="tbl"><h4>otp_codes</h4><ul><li>phone verification</li><li>expiry + attempt limit</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- RUN LOCALLY -->
+<section>
+  <div class="wrap">
+    <div class="section-eyebrow">Get it running</div>
+    <h2>Run the app locally</h2>
+    <p class="sub">You need Node.js 18 or newer (the build was made on Node 22). No database to install — SQLite is bundled.</p>
+
+    <div class="steps">
+      <div class="step">
+        <h4>Unzip and enter the folder</h4>
+        <pre><button class="copy">copy</button><code>unzip kwanta.zip
+cd kwanta</code></pre>
+      </div>
+      <div class="step">
+        <h4>Install dependencies</h4>
+        <p>Pulls in Express, better-sqlite3, bcrypt, and JWT.</p>
+        <pre><button class="copy">copy</button><code>npm install</code></pre>
+        <p class="note" style="margin-top:.7rem">If <code>better-sqlite3</code> fails to build on Windows, install the “Desktop development with C++” workload (Visual Studio Build Tools). On macOS run <code>xcode-select --install</code>. On Linux you're usually fine.</p>
+      </div>
+      <div class="step">
+        <h4>Create your config</h4>
+        <p>Copy the example and set your secrets. Leave <code>ADSENSE_CLIENT</code> blank for now — the app runs a simulated ad in dev so you can test the whole loop offline.</p>
+        <pre><button class="copy">copy</button><code>cp .env.example .env
+# generate a strong secret:
+node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"</code></pre>
+        <p>Paste that value into <code>JWT_SECRET</code> (and generate another for <code>AD_SSV_HMAC_SECRET</code>). Add your own email to <code>ADMIN_EMAILS</code> so you can see the admin panel.</p>
+      </div>
+      <div class="step">
+        <h4>Initialise the database</h4>
+        <pre><button class="copy">copy</button><code>npm run init-db</code></pre>
+      </div>
+      <div class="step">
+        <h4>Start it</h4>
+        <pre><button class="copy">copy</button><code>npm start</code></pre>
+        <p>Open <a href="http://localhost:3000">http://localhost:3000</a>. Register an account, tap <b>Watch ad &amp; earn</b> a few times, verify your phone (the dev code prints in the terminal), then request a payout.</p>
+      </div>
+      <div class="step">
+        <h4>See the admin side</h4>
+        <p>Register (or sign in) with the email you put in <code>ADMIN_EMAILS</code>, then click <b>Admin</b> to review payouts and watch your revenue vs. margin update live.</p>
+      </div>
+    </div>
+
+    <p class="note">Going live later: get AdSense approved for H5 Games Ads, set <code>ADSENSE_CLIENT</code>, move from SQLite to Postgres, and wire an SMS provider + payout provider. The full checklist is in <code>README.md</code>.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">Kwanta — interactive overview. Everything shown here maps to real files in the project: routes in <span class="mono">server/routes</span>, verification in <span class="mono">server/services/adReward.js</span>, the ledger in <span class="mono">server/services/ledger.js</span>.</div>
+</footer>
+
+<script>
+// ── Earn-loop pipeline ──────────────────────────────────────────────
+const DETAILS = [
+  { h:'1 · User taps “Watch ad & earn”', b:[
+    'The button in the dashboard fires. The browser first asks the server for permission to show an ad — it never credits points itself.',
+    'This is a real user gesture, which is also what the ad SDK needs to allow a video to play.'] },
+  { h:'2 · Server issues a single-use session', b:[
+    '<code>POST /api/ads/session</code> checks eligibility: account not banned, daily cap not hit, IP not flagged for velocity.',
+    'It returns a random <b>session token</b> — one-time-use, valid 15 minutes, tied to this user.'] },
+  { h:'3 · The ad plays', b:[
+    'On web, AdSense H5 shows a rewarded video via <code>adBreak({type:"reward"})</code>. In dev with no Publisher ID, a 3-second simulated ad stands in.',
+    'If the user skips it, no reward — the flow stops here.'] },
+  { h:'4 · The reward is verified', b:[
+    'Web: the browser calls <code>POST /api/ads/claim</code> with the session token; the server validates it (single-use, unexpired, within cap).',
+    'App: the ad network\'s servers call <code>POST /api/ads/ssv</code> and the server checks the cryptographic signature before crediting.'] },
+  { h:'5 · Ledger entry + new balance', b:[
+    'A row lands in <code>ad_events</code> (unique transaction id = no double-credit) and a <code>+1</code> entry in the append-only <code>points_ledger</code>.',
+    'The balance — always the sum of the ledger — ticks up in the UI.'] },
+];
+const stages = [...document.querySelectorAll('.stage')];
+const detail = document.getElementById('detail');
+const token = document.getElementById('token');
+const pipe = document.getElementById('pipe');
+let cur = 0;
+
+function render(i){
+  cur = i;
+  stages.forEach(s => s.classList.toggle('active', +s.dataset.i === i));
+  const d = DETAILS[i];
+  detail.innerHTML = '<h3>'+d.h+'</h3>' + d.b.map(p=>'<p>'+p+'</p>').join('');
+  moveToken(i);
+}
+function moveToken(i){
+  const stage = stages[i];
+  const pr = pipe.getBoundingClientRect();
+  const sr = stage.getBoundingClientRect();
+  token.style.opacity = 1;
+  token.style.left = (sr.left - pr.left + sr.width/2) + 'px';
+}
+stages.forEach(s => s.addEventListener('click', ()=>render(+s.dataset.i)));
+
+let playing = null;
+document.getElementById('play').addEventListener('click', ()=>{
+  clearInterval(playing);
+  let i = 0; render(0);
+  playing = setInterval(()=>{
+    i++;
+    if(i>4){ clearInterval(playing); return; }
+    render(i);
+  }, 1300);
+});
+document.getElementById('reset').addEventListener('click', ()=>{ clearInterval(playing); render(0); });
+render(0);
+window.addEventListener('resize', ()=>moveToken(cur));
+
+// ── Two-paths toggle ────────────────────────────────────────────────
+document.querySelectorAll('#toggle button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    document.querySelectorAll('#toggle button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    const p = b.dataset.p;
+    document.getElementById('path-web').style.display = p==='web'?'block':'none';
+    document.getElementById('path-app').style.display = p==='app'?'block':'none';
+  });
+});
+
+// ── Economics calculator ────────────────────────────────────────────
+const el = id => document.getElementById(id);
+const R = n => 'R' + n.toLocaleString('en-ZA', {maximumFractionDigits: n<100?2:0});
+function calc(){
+  const ecpm = +el('ecpm').value;        // ZAR per 1000 views
+  const rewardC = +el('reward').value;   // cents per ad
+  const dau = +el('dau').value;
+  const apu = +el('apu').value;
+
+  const revPerAd = ecpm/1000;            // ZAR
+  const rewardPerAd = rewardC/100;       // ZAR
+  const marginPerAd = revPerAd - rewardPerAd;
+  const adsPerDay = dau*apu;
+  const grossMonth = adsPerDay*revPerAd*30;
+  const paidMonth = adsPerDay*rewardPerAd*30;
+  const marginMonth = grossMonth - paidMonth;
+
+  el('ecpm-v').textContent = 'R'+ecpm.toFixed(2);
+  el('reward-v').textContent = rewardC.toFixed(2)+'c';
+  el('dau-v').textContent = dau.toLocaleString();
+  el('apu-v').textContent = apu;
+
+  const big = el('monthly');
+  big.textContent = (marginMonth<0?'−R':'R') + Math.abs(marginMonth).toLocaleString('en-ZA',{maximumFractionDigits:0});
+  big.classList.toggle('neg', marginMonth<0);
+
+  el('rpa').textContent = 'R'+revPerAd.toFixed(4);
+  el('mpa').textContent = (marginPerAd<0?'−R':'R')+Math.abs(marginPerAd).toFixed(4);
+  el('apd').textContent = adsPerDay.toLocaleString();
+  el('gpm').textContent = R(grossMonth);
+  el('ppm').textContent = R(paidMonth);
+  el('warn').classList.toggle('show', rewardPerAd >= revPerAd);
+}
+['ecpm','reward','dau','apu'].forEach(id=>el(id).addEventListener('input', calc));
+calc();
+
+// ── Copy buttons ────────────────────────────────────────────────────
+document.querySelectorAll('.copy').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    const code = b.parentElement.querySelector('code').innerText;
+    navigator.clipboard.writeText(code).then(()=>{
+      const t = b.textContent; b.textContent = 'copied ✓';
+      setTimeout(()=>b.textContent=t, 1400);
+    });
+  });
+});
+</script>
+</body>
+</html>
