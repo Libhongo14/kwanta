@@ -181,14 +181,30 @@ $('#btn-watch').addEventListener('click', async () => {
 });
 
 // Shows a real AdSense H5 rewarded ad. Resolves only if the user watched it to
-// completion (adViewed). Rejects on dismiss or if no ad was available.
+// completion (adViewed). Rejects on dismiss, no fill, or if the network never
+// calls back at all (common for a site still pending approval — without a
+// timeout the modal would hang forever with no way out).
 function showRewardedAd() {
   return new Promise((resolve, reject) => {
     let rewarded = false;
+    let settled = false;
+    const settle = (fn) => (...args) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeoutId);
+      fn(...args);
+    };
+    const doResolve = settle(resolve);
+    const doReject = settle(reject);
+
     $('#ad-modal').classList.remove('hidden');
     $('#ad-count').textContent = '';
-    // eslint-disable-next-line no-undef
-    adBreak({
+
+    const timeoutId = setTimeout(() => {
+      doReject(new Error('Ad took too long to load. Try again shortly.'));
+    }, 12000);
+
+    window.adBreak({
       type: 'reward',
       name: 'earn_points',
       beforeAd: () => {},
@@ -196,9 +212,9 @@ function showRewardedAd() {
       // The user already tapped our button (a user gesture), so show immediately.
       beforeReward: (showAdFn) => showAdFn(),
       adViewed: () => { rewarded = true; },
-      adDismissed: () => reject(new Error('Ad skipped — no points this time.')),
+      adDismissed: () => doReject(new Error('Ad skipped — no points this time.')),
       adBreakDone: () =>
-        rewarded ? resolve() : reject(new Error('No ad available right now. Try again shortly.')),
+        rewarded ? doResolve() : doReject(new Error('No ad available right now. Try again shortly.')),
     });
   });
 }
