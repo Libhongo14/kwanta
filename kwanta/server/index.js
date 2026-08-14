@@ -10,6 +10,7 @@ import adsRoutes from './routes/ads.routes.js';
 import pointsRoutes from './routes/points.routes.js';
 import payoutRoutes from './routes/payout.routes.js';
 import adminRoutes from './routes/admin.routes.js';
+import { readFileSync } from 'node:fs';   // add this import near the top
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 migrate();
@@ -37,16 +38,32 @@ app.use('/api/points', pointsRoutes);
 app.use('/api/payouts', payoutRoutes);
 app.use('/api/admin', adminRoutes);
 
+
 // Frontend.
-app.use(express.static(join(__dirname, 'public')));
+// index.html is served through a small template step (not express.static)
+// so the AdSense script tag can be injected server-side, directly into the
+// raw HTML response. AdSense's site-verification crawler scans the initial
+// page source for the ca-pub tag — it doesn't reliably wait for the async
+// fetch + DOM injection the frontend used to do, which is why verification
+// was failing. { index: false } stops express.static from also serving the
+// unprocessed file for '/'.
+app.use(express.static(join(__dirname, 'public'), { index: false }));
+
+const indexPath = join(__dirname, 'public', 'index.html');
+const adsenseHead = config.adsenseClient
+  ? `<script>
+window.adsbygoogle = window.adsbygoogle || [];
+window.adBreak = window.adConfig = function(o){ window.adsbygoogle.push(o); };
+</script>
+<script async crossorigin="anonymous" data-ad-frequency-hint="${config.adFrequencyHint}"
+  src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(config.adsenseClient)}"></script>`
+  : '';
+
+function renderIndex(req, res) {
+  const html = readFileSync(indexPath, 'utf8').replace('<!--ADSENSE_HEAD-->', adsenseHead);
+  res.set('Content-Type', 'text/html; charset=utf-8').send(html);
+}
+
 // SPA fallback for any non-API GET (Express 5 wildcard syntax).
-app.get('/{*any}', (req, res) => res.sendFile(join(__dirname, 'public', 'index.html')));
-
-app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(500).json({ error: 'Something went wrong on our side.' });
-});
-
-app.listen(config.port, () => {
-  console.log(`AdRewards running on ${config.publicBaseUrl} (port ${config.port}, ${config.env})`);
-});
+app.get('/', renderIndex);
+app.get('/{*any}', renderIndex);

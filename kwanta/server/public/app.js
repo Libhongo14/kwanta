@@ -219,23 +219,25 @@ function playAd() {
 }
 
 // Loads the AdSense H5 Ad Placement API if a Publisher ID is configured.
+// The script tag itself is now injected server-side directly into the HTML
+// <head> (see server/index.js) — required for AdSense's site-verification
+// crawler to find it reliably. This just waits for that tag to finish
+// loading and preloads a rewarded ad break.
 async function initAds() {
   try {
     const c = await api('/ads/public-config');
     if (!c.adsenseClient) return; // dev mode: simulated ad
-    await new Promise((resolve, reject) => {
-      window.adsbygoogle = window.adsbygoogle || [];
-      // Define the adBreak/adConfig globals the API expects.
-      window.adBreak = window.adConfig = (o) => window.adsbygoogle.push(o);
-      const s = document.createElement('script');
-      s.async = true;
-      s.crossOrigin = 'anonymous';
-      s.dataset.adFrequencyHint = c.adFrequencyHint || '30s';
-      s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(c.adsenseClient)}`;
-      s.onload = resolve;
-      s.onerror = () => reject(new Error('ad script failed'));
-      document.head.appendChild(s);
-    });
+    if (!window.adBreak) {
+      // Script tag hasn't loaded yet (or ADSENSE_CLIENT isn't set on the
+      // server side) — wait briefly for it, since it loads async.
+      await new Promise((resolve, reject) => {
+        const start = Date.now();
+        const check = setInterval(() => {
+          if (window.adBreak) { clearInterval(check); resolve(); }
+          else if (Date.now() - start > 8000) { clearInterval(check); reject(new Error('ad script not ready')); }
+        }, 100);
+      });
+    }
     // Preload rewarded ads and start muted (best practice for autoplay policies).
     window.adConfig({ preloadAdBreaks: 'on', sound: 'off' });
     adsLive = true;
