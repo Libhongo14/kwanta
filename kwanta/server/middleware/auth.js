@@ -1,13 +1,13 @@
 import { verifyToken, isAdmin } from '../auth.js';
 import { db } from '../db.js';
 
-export function requireAuth(req, res, next) {
+export async function requireAuth(req, res, next) {
   const header = req.headers.authorization || '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : null;
   if (!token) return res.status(401).json({ error: 'Sign in to continue.' });
   try {
     const payload = verifyToken(token);
-    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(payload.sub);
+    const user = await db.get('SELECT * FROM users WHERE id = ?', [payload.sub]);
     if (!user) return res.status(401).json({ error: 'Account not found.' });
     if (user.status === 'banned')
       return res.status(403).json({ error: 'This account is suspended.' });
