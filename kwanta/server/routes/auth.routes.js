@@ -18,15 +18,15 @@ router.post(
     if (!password || password.length < 8)
       return res.status(400).json({ error: 'Password must be at least 8 characters.' });
 
-    const exists = db.prepare('SELECT id FROM users WHERE email = ?').get(email.toLowerCase());
+    const exists = await db.get('SELECT id FROM users WHERE email = ?', [email.toLowerCase()]);
     if (exists) return res.status(409).json({ error: 'That email is already registered.' });
 
     const hash = await hashPassword(password);
-    const info = db
-      .prepare('INSERT INTO users (email, password_hash, last_ip) VALUES (?, ?, ?)')
-      .run(email.toLowerCase(), hash, req.ip);
-    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(info.lastInsertRowid);
-    res.json({ token: signToken(user), user: publicUser(user) });
+    const inserted = await db.get(
+      'INSERT INTO users (email, password_hash, last_ip) VALUES (?, ?, ?) RETURNING *',
+      [email.toLowerCase(), hash, req.ip]
+    );
+    res.json({ token: signToken(inserted), user: publicUser(inserted) });
   }
 );
 
@@ -35,10 +35,10 @@ router.post(
   rateLimit({ windowMs: 60_000, max: 10 }),
   async (req, res) => {
     const { email, password } = req.body || {};
-    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(String(email || '').toLowerCase());
+    const user = await db.get('SELECT * FROM users WHERE email = ?', [String(email || '').toLowerCase()]);
     if (!user || !(await verifyPassword(password || '', user.password_hash)))
       return res.status(401).json({ error: 'Email or password is incorrect.' });
-    db.prepare('UPDATE users SET last_ip = ? WHERE id = ?').run(req.ip, user.id);
+    await db.run('UPDATE users SET last_ip = ? WHERE id = ?', [req.ip, user.id]);
     res.json({ token: signToken(user), user: publicUser(user) });
   }
 );
@@ -52,39 +52,42 @@ router.post(
   '/phone/request',
   requireAuth,
   rateLimit({ windowMs: 60_000, max: 3, key: (r) => r.user.id }),
-  (req, res) => {
+  async (req, res) => {
     const phone = normalizePhone(req.body?.phone);
     if (!phone) return res.status(400).json({ error: 'Enter a valid SA mobile number.' });
 
     const code = String(crypto.randomInt(100000, 1000000));
-    db.prepare(
+    await db.run(
       `INSERT INTO otp_codes (phone, code, expires_at, attempts)
-       VALUES (?, ?, datetime('now', '+10 minutes'), 0)
+       VALUES (?, ?, NOW() + INTERVAL '10 minutes', 0)
        ON CONFLICT(phone) DO UPDATE SET code = excluded.code,
-         expires_at = excluded.expires_at, attempts = 0`
-    ).run(phone, code);
-    db.prepare('UPDATE users SET phone = ? WHERE id = ?').run(phone, req.user.id);
+         expires_at = excluded.expires_at, attempts = 0`,
+      [phone, code]
+    );
+    await db.run('UPDATE users SET phone = ? WHERE id = ?', [phone, req.user.id]);
 
     sendOtp(phone, code);
     res.json({ sent: true, devHint: config.smsProviderKey ? undefined : code });
   }
 );
 
-router.post('/phone/verify', requireAuth, (req, res) => {
+router.post('/phone/verify', requireAuth, async (req, res) => {
   const phone = normalizePhone(req.body?.phone);
   const code = String(req.body?.code || '');
-  const row = db.prepare('SELECT * FROM otp_codes WHERE phone = ?').get(phone);
+  const row = await db.get('SELECT * FROM otp_codes WHERE phone = ?', [phone]);
   if (!row) return res.status(400).json({ error: 'Request a code first.' });
   if (row.attempts >= 5) return res.status(429).json({ error: 'Too many attempts. Request a new code.' });
-  db.prepare('UPDATE otp_codes SET attempts = attempts + 1 WHERE phone = ?').run(phone);
+  await db.run('UPDATE otp_codes SET attempts = attempts + 1 WHERE phone = ?', [phone]);
 
-  const expired = db.prepare("SELECT datetime('now') > expires_at AS e FROM otp_codes WHERE phone = ?").get(phone).e;
-  if (expired) return res.status(400).json({ error: 'Code expired. Request a new one.' });
+  const expiredRow = await db.get("SELECT NOW() > expires_at AS e FROM otp_codes WHERE phone = ?", [phone]);
+  if (expiredRow?.e) return res.status(400).json({ error: 'Code expired. Request a new one.' });
   if (row.code !== code) return res.status(400).json({ error: 'Incorrect code.' });
 
-  db.prepare('UPDATE users SET phone_verified = 1, phone = ? WHERE id = ?').run(phone, req.user.id);
-  db.prepare('DELETE FROM otp_codes WHERE phone = ?').run(phone);
-  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.user.id);
+  const user = await db.get(
+    'UPDATE users SET phone_verified = 1, phone = ? WHERE id = ? RETURNING *',
+    [phone, req.user.id]
+  );
+  await db.run('DELETE FROM otp_codes WHERE phone = ?', [phone]);
   res.json({ verified: true, user: publicUser(user) });
 });
 

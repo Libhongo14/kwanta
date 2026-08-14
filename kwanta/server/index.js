@@ -1,6 +1,7 @@
 import express from 'express';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { readFileSync } from 'node:fs';
 import { config } from './config.js';
 import { migrate } from './db.js';
 import { rateLimit } from './middleware/rateLimit.js';
@@ -10,10 +11,9 @@ import adsRoutes from './routes/ads.routes.js';
 import pointsRoutes from './routes/points.routes.js';
 import payoutRoutes from './routes/payout.routes.js';
 import adminRoutes from './routes/admin.routes.js';
-import { readFileSync } from 'node:fs';   // add this import near the top
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-migrate();
+await migrate();
 
 const app = express();
 app.set('trust proxy', 1); // behind a reverse proxy / load balancer in prod
@@ -37,7 +37,6 @@ app.use('/api/ads', adsRoutes);
 app.use('/api/points', pointsRoutes);
 app.use('/api/payouts', payoutRoutes);
 app.use('/api/admin', adminRoutes);
-
 
 // Frontend.
 // index.html is served through a small template step (not express.static)
@@ -67,3 +66,12 @@ function renderIndex(req, res) {
 // SPA fallback for any non-API GET (Express 5 wildcard syntax).
 app.get('/', renderIndex);
 app.get('/{*any}', renderIndex);
+
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ error: 'Something went wrong on our side.' });
+});
+
+app.listen(config.port, () => {
+  console.log(`AdRewards running on ${config.publicBaseUrl} (port ${config.port}, ${config.env})`);
+});

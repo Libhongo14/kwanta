@@ -5,8 +5,8 @@ import { getBalance, getLedger } from '../services/ledger.js';
 
 const router = Router();
 
-router.get('/balance', requireAuth, (req, res) => {
-  const balance = getBalance(req.user.id);
+router.get('/balance', requireAuth, async (req, res) => {
+  const balance = await getBalance(req.user.id);
   res.json({
     points: balance,
     valueCents: balance * config.pointValueCents,
@@ -15,8 +15,8 @@ router.get('/balance', requireAuth, (req, res) => {
   });
 });
 
-router.get('/history', requireAuth, (req, res) => {
-  res.json({ entries: getLedger(req.user.id, 100) });
+router.get('/history', requireAuth, async (req, res) => {
+  res.json({ entries: await getLedger(req.user.id, 100) });
 });
 
 export default router;

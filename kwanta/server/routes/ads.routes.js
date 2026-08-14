@@ -23,8 +23,8 @@ router.get('/public-config', (req, res) => {
 });
 
 // What the client needs to render the "watch ad" UI.
-router.get('/config', requireAuth, (req, res) => {
-  const used = adsToday(req.user.id);
+router.get('/config', requireAuth, async (req, res) => {
+  const used = await adsToday(req.user.id);
   res.json({
     pointsPerAd: config.pointsPerAd,
     adsWatchedToday: used,
@@ -39,12 +39,12 @@ router.post(
   '/session',
   requireAuth,
   rateLimit({ windowMs: 60_000, max: 30, key: (r) => r.user.id }),
-  (req, res) => {
-    const elig = checkAdEligibility(req.user);
+  async (req, res) => {
+    const elig = await checkAdEligibility(req.user);
     if (!elig.ok) return res.status(403).json({ error: elig.reason });
-    if (ipVelocityHigh(req.ip))
+    if (await ipVelocityHigh(req.ip))
       return res.status(429).json({ error: 'Unusual activity detected. Please slow down.' });
-    const token = issueAdSession(req.user.id, req.ip);
+    const token = await issueAdSession(req.user.id, req.ip);
     res.json({ sessionToken: token });
   }
 );
@@ -80,7 +80,7 @@ async function handleSsv(req, res) {
   }
   if (!ok) return res.status(403).send('invalid signature');
 
-  const result = creditAdView({
+  const result = await creditAdView({
     transactionId: String(transactionId),
     sessionToken: String(sessionToken),
     network: String(network),
@@ -113,11 +113,11 @@ router.post(
   async (req, res) => {
     const sessionToken = req.body?.sessionToken;
     if (!sessionToken) return res.status(400).json({ error: 'Missing ad session.' });
-    if (ipVelocityHigh(req.ip))
+    if (await ipVelocityHigh(req.ip))
       return res.status(429).json({ error: 'Unusual activity detected. Please slow down.' });
 
     const { randomBytes } = await import('node:crypto');
-    const result = creditAdView({
+    const result = await creditAdView({
       transactionId: 'h5-' + randomBytes(12).toString('hex'),
       sessionToken: String(sessionToken),
       network: 'adsense-h5',
@@ -144,7 +144,7 @@ router.post(
 // network's SSV callback replace this entirely.
 if (config.env !== 'production') {
   const crypto = await import('node:crypto');
-  router.post('/dev-complete', requireAuth, (req, res) => {
+  router.post('/dev-complete', requireAuth, async (req, res) => {
     const sessionToken = req.body?.sessionToken;
     if (!sessionToken) return res.status(400).json({ error: 'sessionToken required' });
     const params = {
@@ -165,7 +165,7 @@ if (config.env !== 'production') {
     if (!verifyHmacSignature(params, params.signature))
       return res.status(500).json({ error: 'signature self-check failed' });
 
-    const result = creditAdView({
+    const result = await creditAdView({
       transactionId: params.transaction_id,
       sessionToken,
       network: params.ad_network,
